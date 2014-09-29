@@ -13,7 +13,7 @@ namespace httpserver
         {
             Console.WriteLine("--- HTTP server is started ---");
 
-            TcpListener serversocket = new TcpListener(8080);
+            TcpListener serversocket = new TcpListener(8087);
             serversocket.Start();
 
             while (true)
@@ -24,9 +24,13 @@ namespace httpserver
 
                 HTTPService service = new HTTPService(connectionSocket);
 
+                service.doIt();
 
-            }
+            } //End of while-loop
 
-        }
-    }
-}
+            serversocket.Stop();
+        }//End of Main
+
+
+    }//End of Class
+}//End of namespace

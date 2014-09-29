@@ -16,7 +16,10 @@ namespace httpserver
             this.connectionSocket = cntsocket;
         }
 
-
+        public void doIt()
+        {
+            Console.WriteLine("Der er oprettet forbindelse...");
+        }
 
 
     }
