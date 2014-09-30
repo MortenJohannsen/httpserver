@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,11 +32,12 @@ namespace httpserver
             string header1 = "Last-modified: " + date + CRLF;
             string header2 = "Content-type: " + htmlType + CRLF;
             string blankline = CRLF;
+            string body = "Hello world!" + CRLF;
 
-            sw.WriteLine(statusline);
+            sw.WriteLine(statusline + header1 + header2 + blankline + body);
 
 
-            Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}:", statusline, header1, header2, blankline);
+            Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}, {4}:", statusline, header1, header2, blankline, body);
 
             sw.Close();
             connectionSocket.Close();
