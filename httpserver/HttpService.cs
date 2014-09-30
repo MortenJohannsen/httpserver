@@ -26,13 +26,20 @@ namespace httpserver
             Console.WriteLine("Der er oprettet forbindelse...");
             NetworkStream ns = connectionSocket.GetStream();
             StreamWriter sw = new StreamWriter(ns);
+            StreamReader sr = new StreamReader(ns);
             sw.AutoFlush = true;
+
+            string getRequest = sr.ReadLine();
+            Console.WriteLine(getRequest);
+
+            string[] requestArray = new string[3];
+            requestArray = getRequest.Split(' ');  
 
             string statusline = "HTTP/1.0 200 ok" + CRLF;
             string header1 = "Last-modified: " + date + CRLF;
             string header2 = "Content-type: " + htmlType + CRLF;
             string blankline = CRLF;
-            string body = "Hello world!" + CRLF;
+            string body = requestArray.GetValue(1) + CRLF;
 
             sw.WriteLine(statusline + header1 + header2 + blankline + body);
 
