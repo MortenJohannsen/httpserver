@@ -15,6 +15,7 @@ namespace httpserver
         private string date = DateTime.Now.ToString();
         private const string CRLF = "\r\n";
         private const string htmlType = "text/html";
+        private static readonly string RootCatalog = "c:\\webserver";
 
         public HTTPService(TcpClient cntsocket)
         {
@@ -23,31 +24,46 @@ namespace httpserver
 
         public void doIt()
         {
-            Console.WriteLine("Der er oprettet forbindelse...");
-            NetworkStream ns = connectionSocket.GetStream();
-            StreamWriter sw = new StreamWriter(ns);
-            StreamReader sr = new StreamReader(ns);
-            sw.AutoFlush = true;
+            using (connectionSocket)
+            {
+                Console.WriteLine("Der er oprettet forbindelse...");
+                NetworkStream ns = connectionSocket.GetStream();
+                StreamWriter sw = new StreamWriter(ns);
+                StreamReader sr = new StreamReader(ns);
+                sw.AutoFlush = true;
 
-            string getRequest = sr.ReadLine();
-            Console.WriteLine(getRequest);
+                string getRequest = sr.ReadLine();
+                Console.WriteLine(getRequest);
 
-            string[] requestArray = new string[3];
-            requestArray = getRequest.Split(' ');  
+                string[] requestArray = new string[3];
+                requestArray = getRequest.Split(' ');
+                RequestFile(requestArray.GetValue(1).ToString(), ns);
 
-            string statusline = "HTTP/1.0 200 ok" + CRLF;
-            string header1 = "Last-modified: " + date + CRLF;
-            string header2 = "Content-type: " + htmlType + CRLF;
-            string blankline = CRLF;
-            string body = requestArray.GetValue(1) + CRLF;
+                Console.WriteLine(requestArray.GetValue(1).ToString());
 
-            sw.WriteLine(statusline + header1 + header2 + blankline + body);
+                string statusline = "HTTP/1.0 200 ok" + CRLF;
+                string header1 = "Last-modified: " + date + CRLF;
+                string header2 = "Content-type: " + htmlType + CRLF;
+                string blankline = CRLF;
+                string body = RootCatalog + requestArray.GetValue(1) + CRLF;
 
 
-            Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}, {4}:", statusline, header1, header2, blankline, body);
+                //sw.WriteLine(statusline + header1 + header2 + blankline + body);
 
-            sw.Close();
+
+                Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}, {4}:", statusline, header1, header2, blankline, body);
+                
+                sw.Close();
+            }
+            
             connectionSocket.Close();
+
+        }
+
+        public void RequestFile(string array, NetworkStream nsw)
+        {
+            FileStream fs = File.OpenRead(RootCatalog + "/mobajo.html");
+            fs.CopyTo(nsw);
 
         }
 
