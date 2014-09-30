@@ -54,6 +54,7 @@ namespace httpserver
                 Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}, {4}:", statusline, header1, header2, blankline, body);
                 
                 sw.Close();
+                sr.Close(); 
             }
             
             connectionSocket.Close();
@@ -62,8 +63,17 @@ namespace httpserver
 
         public void RequestFile(string array, NetworkStream nsw)
         {
-            FileStream fs = File.OpenRead(RootCatalog + "/mobajo.html");
-            fs.CopyTo(nsw);
+            try
+            {
+                FileStream fs = File.OpenRead(RootCatalog + array);
+                fs.CopyTo(nsw);
+            }
+            catch (FileNotFoundException fnfex)
+            {
+                
+                Console.WriteLine("File not found");
+            }
+            
 
         }
 
