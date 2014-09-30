@@ -11,15 +11,51 @@ namespace httpserverTest
     public class HttpServerTest
     {
         private const string CrLf = "\r\n";
+        private StreamWriter sw;
+        private StreamReader sr;
+        private NetworkStream ns;
+
+        private StartServer start;
+
+        [TestInitialize()]
+        public void HttpServerInit()
+        {
+            
+            start = new StartServer();
+            
+
+
+            TcpClient clientsocket = new TcpClient("localhost", 8087);
+            ns = clientsocket.GetStream();
+            sw = new StreamWriter(ns);
+            sr = new StreamReader(ns);
+            sw.AutoFlush = true;
+ 
+        }
 
         [TestMethod]
-        public void TestGet()
+        public void TestGet1()
         {
             String line = GetFirstLine("GET /file.txt HTTP/1.0");
-            Assert.AreEqual("HTTP/1.0 200 OK", line);
+            sw.WriteLine(line);
+            sw.Close();
+            string read = sr.ReadLine();
+            Assert.AreEqual("HTTP/1.0 200 OK", read);
 
             line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");
             Assert.AreEqual("HTTP/1.0 404 Not Found", line);
+
+
+        }
+
+        [TestMethod]
+        public void TestGet2()
+        {
+
+            String line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");
+            sw.WriteLine(line);
+            string read = sr.ReadLine();
+            Assert.AreEqual("HTTP/1.0 404 Not Found", read);
         }
 
 
@@ -58,7 +94,7 @@ namespace httpserverTest
         /// <returns></returns>
         private static String GetFirstLine(String request)
         {
-            TcpClient client = new TcpClient("localhost", HTTPService.DefaultPort);
+            TcpClient client = new TcpClient("localhost", 8087);
             NetworkStream networkStream = client.GetStream();
 
             StreamWriter toServer = new StreamWriter(networkStream, Encoding.UTF8);

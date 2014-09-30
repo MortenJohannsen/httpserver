@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace httpserver
 {
-    class StartServer
+    public class StartServer
     {
         static void Main(string[] args)
         {
