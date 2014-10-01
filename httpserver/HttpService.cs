@@ -17,6 +17,8 @@ namespace httpserver
         private const string htmlType = "text/html";
         private static readonly string RootCatalog = "c:\\webserver";
 
+        
+
         public HTTPService(TcpClient cntsocket)
         {
             this.connectionSocket = cntsocket;
@@ -26,6 +28,12 @@ namespace httpserver
         {
             using (connectionSocket)
             {
+                string statusline = "HTTP/1.0 200 OK" + CRLF;
+                string header1 = "Last-modified: " + date + CRLF;
+                string header2 = "Content-type: " + htmlType + CRLF;
+                string blankline = CRLF;
+
+
                 Console.WriteLine("Der er oprettet forbindelse...");
                 NetworkStream ns = connectionSocket.GetStream();
                 StreamWriter sw = new StreamWriter(ns);
@@ -33,22 +41,22 @@ namespace httpserver
                 sw.AutoFlush = true;
 
                 string getRequest = sr.ReadLine();
-                Console.WriteLine(getRequest);
+                Console.Write(getRequest);
 
                 string[] requestArray = new string[3];
                 requestArray = getRequest.Split(' ');
+                sw.Write(statusline + header1 + header2 + blankline);
+                //sw.Flush();
                 RequestFile(requestArray.GetValue(1).ToString(), ns);
 
-                Console.WriteLine(requestArray.GetValue(1).ToString());
+                Console.Write(requestArray.GetValue(1).ToString());
 
-                string statusline = "HTTP/1.0 200 ok" + CRLF;
-                string header1 = "Last-modified: " + date + CRLF;
-                string header2 = "Content-type: " + htmlType + CRLF;
-                string blankline = CRLF;
+                
+                
                 string body = RootCatalog + requestArray.GetValue(1) + CRLF;
 
 
-                //sw.WriteLine(statusline + header1 + header2 + blankline + body);
+                
 
 
                 Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}, {4}:", statusline, header1, header2, blankline, body);
