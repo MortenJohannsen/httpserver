@@ -16,6 +16,7 @@ namespace httpserver
         private const string CRLF = "\r\n";
         private const string htmlType = "text/html";
         private static readonly string RootCatalog = "c:\\webserver";
+        private string statusline = null;
 
         
 
@@ -28,7 +29,8 @@ namespace httpserver
         {
             using (connectionSocket)
             {
-                string statusline = "HTTP/1.0 200 OK" + CRLF;
+                string statuslineTrue = "HTTP/1.0 200 OK" + CRLF;
+                string statuslineFalse = "HTTP/1.0 404 Not Found" + CRLF;
                 string header1 = "Last-modified: " + date + CRLF;
                 string header2 = "Content-type: " + htmlType + CRLF;
                 string blankline = CRLF;
@@ -45,6 +47,21 @@ namespace httpserver
 
                 string[] requestArray = new string[3];
                 requestArray = getRequest.Split(' ');
+
+                //find ud af om filen findes
+                bool existingFile = File.Exists(RootCatalog + requestArray.GetValue(1));
+
+                if (existingFile == true)
+                {
+                    statusline = statuslineTrue;
+                }
+                else
+                {
+                    statusline = statuslineFalse;
+                }
+
+                Console.WriteLine(existingFile);
+
                 sw.Write(statusline + header1 + header2 + blankline);
                 //sw.Flush();
                 RequestFile(requestArray.GetValue(1).ToString(), ns);

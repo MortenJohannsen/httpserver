@@ -41,15 +41,13 @@ namespace httpserverTest
 
         }
 
-        //[TestMethod]
-        //public void TestGet2()
-        //{
+        [TestMethod]
+        public void TestGet2()
+        {
 
-        //    String line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");
-        //    sw.Write(line);
-        //    string read = sr.ReadLine();
-        //    Assert.AreEqual("HTTP/1.0 404 Not Found", read);
-        //}
+            String line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");
+            Assert.AreEqual("HTTP/1.0 404 Not Found", line);
+        }
 
 
         //[TestMethod]
