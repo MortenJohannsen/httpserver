@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace httpserver
 {
@@ -22,15 +18,12 @@ namespace httpserver
                 TcpClient connectionSocket = serversocket.AcceptTcpClient();
                 Console.WriteLine("--- New Connection Initiated ---");
 
-                HTTPService service = new HTTPService(connectionSocket);
+                HttpService service = new HttpService(connectionSocket);
 
-                service.doIt();
+                service.DoIt();
 
             } //End of while-loop
-
             serversocket.Stop();
         }//End of Main
-
-
     }//End of Class
 }//End of namespace

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using httpserver;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace httpserverTest
@@ -20,9 +19,8 @@ namespace httpserverTest
         //[TestInitialize()]
         //public void HttpServerInit()
         //{
-            
+
         //    //start = new StartServer();
-            
 
 
         //    TcpClient clientsocket = new TcpClient("localhost", 8087);
@@ -30,7 +28,7 @@ namespace httpserverTest
         //    sw = new StreamWriter(ns);
         //    sr = new StreamReader(ns);
         //    sw.AutoFlush = true;
- 
+
         //}
 
         [TestMethod]
@@ -38,13 +36,11 @@ namespace httpserverTest
         {
             String line = GetFirstLine("GET /mobajo.html HTTP/1.0");
             Assert.AreEqual("HTTP/1.0 200 OK", line);
-
         }
 
         [TestMethod]
         public void TestGet2()
         {
-
             String line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");
             Assert.AreEqual("HTTP/1.0 404 Not Found", line);
         }
@@ -79,27 +75,26 @@ namespace httpserverTest
         //}
 
         /// <summary>
-        /// Private helper method
+        ///     Private helper method
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         private static String GetFirstLine(String request)
         {
-            TcpClient client = new TcpClient("localhost", 8087);
+            var client = new TcpClient("localhost", 8087);
             NetworkStream networkStream = client.GetStream();
 
-            StreamWriter toServer = new StreamWriter(networkStream, Encoding.UTF8);
+            var toServer = new StreamWriter(networkStream, Encoding.UTF8);
             toServer.Write(request + CrLf);
             toServer.Write(CrLf);
             toServer.Flush();
 
-            StreamReader fromServer = new StreamReader(networkStream);
+            var fromServer = new StreamReader(networkStream);
             String firstline = fromServer.ReadLine();
             toServer.Close();
             fromServer.Close();
             client.Close();
             return firstline;
-
         }
     }
 }

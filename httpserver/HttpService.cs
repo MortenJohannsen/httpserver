@@ -1,92 +1,78 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace httpserver
 {
-    public class HTTPService
+    public class HttpService
     {
         private TcpClient connectionSocket;
         private string date = DateTime.Now.ToString();
-        private const string CRLF = "\r\n";
-        private const string htmlType = "text/html";
+        private const string CrLf = "\r\n";
+        private const string HtmlType = "text/html";
         private static readonly string RootCatalog = "c:\\webserver";
-        private string statusline = null;
+        private string _statusline = null;
+        private string[] RequestArray = null;
 
-        
-
-        public HTTPService(TcpClient cntsocket)
+        public HttpService(TcpClient cntsocket)
         {
             this.connectionSocket = cntsocket;
         }
 
-        public void doIt()
+        public void DoIt()
         {
             using (connectionSocket)
             {
-                string statuslineTrue = "HTTP/1.0 200 OK" + CRLF;
-                string statuslineFalse = "HTTP/1.0 404 Not Found" + CRLF;
-                string header1 = "Last-modified: " + date + CRLF;
-                string header2 = "Content-type: " + htmlType + CRLF;
-                string blankline = CRLF;
+                
+                
 
 
                 Console.WriteLine("Der er oprettet forbindelse...");
                 NetworkStream ns = connectionSocket.GetStream();
-                StreamWriter sw = new StreamWriter(ns);
-                StreamReader sr = new StreamReader(ns);
+                var sw = new StreamWriter(ns);
+                var sr = new StreamReader(ns);
                 sw.AutoFlush = true;
 
                 string getRequest = sr.ReadLine();
                 Console.Write(getRequest);
 
-                string[] requestArray = new string[3];
-                requestArray = getRequest.Split(' ');
+                
 
-                //find ud af om filen findes
-                bool existingFile = File.Exists(RootCatalog + requestArray.GetValue(1));
+                sw.Write(this.AssembleHttpResponse(getRequest));
 
-                if (existingFile == true)
+                RequestFile(RequestArray.GetValue(1).ToString(), ns);
+
+                Console.Write(RequestArray.GetValue(1).ToString());
+
+                Console.WriteLine("--- Message sent" + this.AssembleHttpResponse(getRequest + RootCatalog + RequestArray.GetValue(1)));
+
+                sw.Close();
+                sr.Close();
+            }
+            connectionSocket.Close();
+        }
+
+        private string DoesFileExist(string[] RequestArray)
+        {
+            string statuslineTrue = "HTTP/1.0 200 OK" + CrLf;
+            string statuslineFalse = "HTTP/1.0 404 Not Found" + CrLf;
+
+            bool existingFile = File.Exists(RootCatalog + RequestArray.GetValue(1));
+
+                if (existingFile)
                 {
-                    statusline = statuslineTrue;
+                    Console.WriteLine(existingFile);
+                    return statuslineTrue;
                 }
                 else
                 {
-                    statusline = statuslineFalse;
+                    Console.WriteLine(existingFile);
+                    return statuslineFalse;
                 }
-
-                Console.WriteLine(existingFile);
-
-                sw.Write(statusline + header1 + header2 + blankline);
-                //sw.Flush();
-                RequestFile(requestArray.GetValue(1).ToString(), ns);
-
-                Console.Write(requestArray.GetValue(1).ToString());
-
-                
-                
-                string body = RootCatalog + requestArray.GetValue(1) + CRLF;
-
-
-                
-
-
-                Console.WriteLine("--- Message sent {0}, {1}, {2}, {3}, {4}:", statusline, header1, header2, blankline, body);
-                
-                sw.Close();
-                sr.Close(); 
-            }
-            
-            connectionSocket.Close();
-
         }
 
-        public void RequestFile(string array, NetworkStream nsw)
+
+        private void RequestFile(string array, NetworkStream nsw)
         {
             try
             {
@@ -94,14 +80,23 @@ namespace httpserver
                 fs.CopyTo(nsw);
             }
             catch (FileNotFoundException fnfex)
-            {
-                
+            {            
                 Console.WriteLine("File not found");
             }
-            
-
         }
 
+        private string AssembleHttpResponse(string getRequest)
+        {
+            RequestArray = getRequest.Split(' ');
+            
+            _statusline = this.DoesFileExist(RequestArray);
 
+            string header1 = "Last-modified: " + date + CrLf;
+            string header2 = "Content-type: " + HtmlType + CrLf;
+            string blankline = CrLf;
+
+            return _statusline + header1 + header2 + blankline;
+
+        }
     }
 }
