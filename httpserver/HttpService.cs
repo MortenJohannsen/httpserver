@@ -32,7 +32,7 @@ namespace httpserver
             using (connectionSocket)
             {
                 //Udskriver i konsol vindue at, forbindelse er oprettet
-                Console.WriteLine("Der er oprettet forbindelse...");
+                Console.WriteLine("Der er oprettet forbindelse... \n");
 
                 //Åben netværks-stream
                 NetworkStream ns = connectionSocket.GetStream();
@@ -41,13 +41,21 @@ namespace httpserver
                 string therequest = OpenReader(ns);
 
                 //Sender http - response
-                OpenWriter(ns, therequest);
-                RequestFile(RequestArray.GetValue(1).ToString(), ns);
+                //Checking the request, handling nullReferenceExceptions to prevent server from crashing
+                if (therequest == "close_but_no_cigar_exception-condition:119857")
+                {
+                    Console.WriteLine("Keep Alive");
+                }
+                else
+                {
+                    OpenWriter(ns, therequest);
+                    RequestFile(RequestArray.GetValue(1).ToString(), ns);
 
-                //Udskriv i konsol vindue
-                Console.Write(RequestArray.GetValue(1).ToString());
-                Console.WriteLine("--- Message sent" + this.AssembleHttpResponse(therequest + RootCatalog + RequestArray.GetValue(1)));
-                
+                    //Udskriv i konsol vindue
+                    Console.WriteLine("Requested file: " + RequestArray.GetValue(1).ToString());
+                    Console.WriteLine("--- Message sent: " + this.AssembleHttpResponse(therequest + CrLf + RootCatalog + RequestArray.GetValue(1)));
+                }
+
                 //Luk netværks-stream
                 ns.Close();
             }
@@ -76,8 +84,14 @@ namespace httpserver
         {
             var sr = new StreamReader(nsw);
             string getRequest = sr.ReadLine();
-
-            return getRequest;
+            if (getRequest != null)
+            {
+                return getRequest;
+            }
+            else
+            {
+                return "close_but_no_cigar_exception-condition:119857";
+            }
         }
 
         /// <summary>
@@ -94,12 +108,12 @@ namespace httpserver
 
                 if (existingFile)
                 {
-                    Console.WriteLine(existingFile);
+                    Console.WriteLine("Does the file exist in RootDirectory: " + existingFile);
                     return statuslineTrue;
                 }
                 else
                 {
-                    Console.WriteLine(existingFile);
+                    Console.WriteLine("Does the file exist in RootDirectory: " + existingFile);
                     return statuslineFalse;
                 }
         }
@@ -129,7 +143,9 @@ namespace httpserver
         /// <returns>HTTP response : bestående af statusline + headers + blankline</returns>
         private string AssembleHttpResponse(string getRequest)
         {
+            
             RequestArray = getRequest.Split(' ');
+            
             
             _statusline = this.DoesFileExist(RequestArray);
 
