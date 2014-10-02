@@ -156,6 +156,7 @@ namespace httpserver
 
             string header1 = "Last-modified: " + date + CrLf;
             string header2 = "Content-type: " + HtmlType + CrLf;
+            //string header3 = "Content-Length: " + ContentLengthInBytes().ToString() + CrLf;
             string blankline = CrLf;
 
             return _statusline + header1 + header2 + blankline;
@@ -166,6 +167,13 @@ namespace httpserver
         {
             eventlogger = log;
         }
+
+        //public int ContentLengthInBytes()
+        //{
+        //    byte[] bytearray = File.ReadAllBytes(RootCatalog + RequestArray.GetValue(1));
+
+        //    return (int)bytearray.GetValue(0);
+        //}
 
     }//End of class
 
