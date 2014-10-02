@@ -13,6 +13,7 @@ namespace httpserver
         private const string RootCatalog = "c:\\webserver";
         private string _statusline = null;
         private string[] RequestArray = null;
+        private EventLogger eventlogger;
 
         /// <summary>
         /// HTTP Service Constructor
@@ -36,9 +37,11 @@ namespace httpserver
 
                 //Åben netværks-stream
                 NetworkStream ns = connectionSocket.GetStream();
-
+                
                 //Læs request fra browser
                 string therequest = OpenReader(ns);
+                //Opretter event log som fortæller at en request er modtaget fra en client
+                eventlogger.WriteLogEntry(1);
 
                 //Sender http - response
                 //Checking the request, handling nullReferenceExceptions to prevent server from crashing
@@ -50,6 +53,8 @@ namespace httpserver
                 {
                     OpenWriter(ns, therequest);
                     RequestFile(RequestArray.GetValue(1).ToString(), ns);
+                    //Opretter event log som fortæller at en response er sendt til en client
+                    eventlogger.WriteLogEntry(2);
 
                     //Udskriv i konsol vindue
                     Console.WriteLine("Requested file: " + RequestArray.GetValue(1).ToString());
@@ -155,6 +160,11 @@ namespace httpserver
 
             return _statusline + header1 + header2 + blankline;
 
+        }
+
+        public void logger(EventLogger log)
+        {
+            eventlogger = log;
         }
 
     }//End of class
