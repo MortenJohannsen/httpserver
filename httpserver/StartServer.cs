@@ -7,14 +7,16 @@ namespace httpserver
     {
         static void Main(string[] args)
         {
+            //Informerer om at serveren er startet
             Console.WriteLine("--- HTTP server is started ---");
 
+            //Opretter og fortæller hvilken socket/port som serveren skal lytte på
             TcpListener serversocket = new TcpListener(8087);
             serversocket.Start();
 
             while (true)
             {
-                //Accept Request
+                //Accepter Request
                 TcpClient connectionSocket = serversocket.AcceptTcpClient();
                 Console.WriteLine("--- New Connection Initiated ---");
 
@@ -23,7 +25,13 @@ namespace httpserver
                 service.DoIt();
 
             } //End of while-loop
+
+            //Endnu ikke implementeret. Lukker for HTTP servicen.
             serversocket.Stop();
+
         }//End of Main
+
+
     }//End of Class
+
 }//End of namespace
